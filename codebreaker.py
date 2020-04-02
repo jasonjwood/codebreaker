@@ -10,8 +10,6 @@ def choose_code():
         code.append(values[pick_index])
         values.remove(values[pick_index])
 
-    print(code)
-
     return code
 
 
@@ -71,38 +69,64 @@ def print_game_board(game_board):
     count = 1
     for row in game_board:
         guess_spaced = colour_guess(row['guess'])
-        check_spaced = space_string(row['check'])
-        print('#' + str(count) + ' Guess: ' + guess_spaced + '          ' + check_spaced + '\n')
+        print('#' + str(count) + ' Guess: ' + guess_spaced + '           Result: ' + row['check'] + '\n')
         count = count + 1
 
 
 def check_guess(code, guess):
-    return 'ALEX'
+    num_stars = 0
+    num_checkmarks = 0
+
+    index = 0
+    for letter in guess:
+        # Is it the right letter in the right place?
+        if letter == code[index]:
+            num_stars = num_stars + 1
+        # Is it the right letter but NOT in the right place?
+        elif letter in code:
+            num_checkmarks = num_checkmarks + 1
+
+        index = index + 1
+
+    # Print result of checking on the screen
+    result = ''
+    if num_stars == 5:
+        result = 'WINNER'
+    else:
+        while num_stars > 0:
+            result = result + '@ '
+            num_stars = num_stars - 1
+        while num_checkmarks > 0:
+            result = result + '! '
+            num_checkmarks = num_checkmarks - 1
+
+    return result
 
 
 def main():
+    game_board = []
+
     # Randomly pick the code
     code = choose_code()
 
-    game_board = []
-
     # Loop over turns
-    is_solved = False
-    while not is_solved:
+    game_over = False
+    while not game_over:
         # Ask for guess
         guess_input = get_guess()
 
         if guess_input['guess_ok'] is False:
             continue
 
-        # Check guess and show answer
+        # Check guess
         check = check_guess(code, guess_input['guess'])
 
+        # Show game board
         game_board.append({'guess': guess_input['guess'], 'check': check})
         print_game_board(game_board)
 
         if check == 'WINNER':
-            is_solved = True
+            game_over = True
 
 
 main()
